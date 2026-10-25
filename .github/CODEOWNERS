@@ -1,0 +1,8 @@
+# Default maintainer for repository changes
+* @ohanatechsolutions
+
+# Review CI, installer, and security documentation carefully
+/.github/ @ohanatechsolutions
+/installer/ @ohanatechsolutions
+/SECURITY.md @ohanatechsolutions
+/PRIVACY.md @ohanatechsolutions
