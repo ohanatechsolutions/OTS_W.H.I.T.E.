@@ -1,0 +1,16 @@
+# Changelog
+
+## v0.1.0 — initial public-code baseline (2026-10-24, Hawaii)
+
+- Offline built-in credential detection, high-entropy heuristics, and basic SAST/configuration checks.
+- Locally reachable Git history scanning and changed-path PR comparison using Git plumbing.
+- OSV-Scanner v2 offline SCA adapter (external scanner/database needed; no remote private-code submission).
+- Redacted terminal/JSON/SARIF output and fail-closed operational exit code.
+- Local Python/Tk Windows GUI, Windows launchers, installable Python package.
+- GitHub Actions security/tests workflow with least-privilege contents read.
+- Windows executable and unsigned Inno Setup installer build, with SHA-256 checksum artifact.
+- 19 regression tests passing on Ubuntu and Windows CI runners.
+
+### Release qualification
+
+Build and checksum are verified; no claim of code signing, production-grade taint analysis, full coverage of GitHub remote PRs, live offline OSV database integration, or interactive Windows machine acceptance testing is made. See `docs/TEST_PLAN.md`, `SECURITY.md`, and `installer/README.md`.
