@@ -6,7 +6,6 @@ permissions:
   contents: write
 jobs:
   publish:
-    if: ${{ hashFiles('bootstrap/aegis_white_source.tar.bz2') != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
