@@ -1,5 +1,16 @@
 # Changelog
 
+This project records shipped changes by version and pending repository work under **Unreleased**; no new application version is implied by the latter.
+
+## [Unreleased]
+
+### Repository maintenance
+- Added project-specific privacy, contribution, third-party notice and engineering/deployment/troubleshooting documentation.
+- Established .editorconfig, broader Git ignore rules, CODEOWNERS, Dependabot and GitHub contribution templates.
+- Updated Windows build automation to avoid **future** generated installer commits to source history; the previously committed Windows 0.1.0 `.exe` and `.sha256` remain in `installer/` as requested. Version tags are configured to publish installer and matching checksum as GitHub Release assets; successful builds continue to upload temporary Actions artifacts.
+- Updated private vulnerability reporting and maintainer guidance. No application scanning or GUI behavior was intentionally changed.
+
+
 ## v0.1.0 — initial public-code baseline (2026-10-24, Hawaii)
 
 - Offline built-in credential detection, high-entropy heuristics, and basic SAST/configuration checks.
