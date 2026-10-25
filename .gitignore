@@ -1,13 +1,47 @@
+# Python, test, coverage and local tooling
 __pycache__/
 *.py[cod]
 *.egg-info/
 dist/
 build/
 .venv/
+venv/
 .tox/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 htmlcov/
+
+# Local IDE, OS files and temporary/log artifacts
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+*.bak
+*~
+*.swp
+
+# Credentials and local-only configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.p12
+*.pfx
+*.key
+id_rsa
+id_ed25519
+secrets.json
+
+# Scanning and packaging outputs (download distributables from Actions/Releases)
 reports/
 *.sarif
 *.audit.json
 .osv-cache/
+installer/output/
+installer/AegisWhite_Setup_*.exe
+installer/AegisWhite_Setup_*.exe.sha256

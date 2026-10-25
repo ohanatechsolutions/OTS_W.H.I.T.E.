@@ -22,6 +22,8 @@ UninstallDisplayIcon={app}\AegisWhite.exe
 
 [Files]
 Source: "..\dist\AegisWhite.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\THIRD_PARTY_NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Aegis White"; Filename: "{app}\AegisWhite.exe"
