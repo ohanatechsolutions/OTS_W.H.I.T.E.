@@ -1,30 +1,26 @@
-# Windows installer
+# Aegis White — Windows installer
 
-**The Windows installer is an `.exe`, not the `.iss` source recipe.** The Inno Setup file in this folder is used by the automated build; it is not itself a runnable installer.
+**The runnable Windows installer is checked into this folder as an `.exe`.**
 
-## Ready-to-download v0.1.0
+- [Download the current Aegis White installer](https://github.com/ohanatechsolutions/Aegis_White/blob/main/installer/AegisWhite_Setup_v0.1.0_x64.exe)
+- [Download the SHA-256 checksum manifest](https://github.com/ohanatechsolutions/Aegis_White/blob/main/installer/AegisWhite_Setup_v0.1.0_x64.exe.sha256)
+- `AegisWhite.iss` is the **Inno Setup source recipe**, *not* the runnable installer.
 
-[Download the Windows installer artifact from the successful GitHub Actions build](https://github.com/ohanatechsolutions/Aegis_White/actions/runs/40173916046).
+Open the installer link while logged into the private GitHub account, then select **Download raw file** (or the download icon). The installer targets Windows 10/11 x64. It is unsigned.
 
-Expand **Artifacts** and download `AegisWhite-Windows-Installer`. Unzip it to get:
+## Verify the download
 
-- `AegisWhite_Setup_v0.1.0_x64.exe` — the Windows 10/11 x64 installer.
-- `AegisWhite_Setup_v0.1.0_x64.exe.sha256` — the checksum manifest.
-
-Installer SHA-256 from this specific run:
-
-`752aea471a6da38bcb4c19fd1f1c6b54eb24225e08289273df75c29a06d60d9a`
-
-To verify in PowerShell:
+Run PowerShell in the folder where the .exe and .sha256 files were downloaded:
 
 ```powershell
 (Get-FileHash .\AegisWhite_Setup_v0.1.0_x64.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+Get-Content .\AegisWhite_Setup_v0.1.0_x64.exe.sha256
 ```
 
-Compare its result with the above digest before installing. This release is **unsigned**; do not mistake a Windows SmartScreen warning for proof of tampering, or the absence of a warning for proof of security.
+Verify the digest matches the 64-character hexadecimal string in the matching `.sha256` file. Different builds may have different digests even with the same version number: **do not mix checksums from separate builds**.
 
-## Building another installer
+## Build yourself / rebuild
 
-Use **Actions → Windows Installer → Run workflow**. The workflow runs unit tests, packages the Tk GUI with PyInstaller, compiles the Inno Setup recipe, creates a fresh SHA-256 file, and uploads both as a GitHub Actions artifact. No paid installer tooling or runtime subscription is required.
+Open [GitHub Actions → Windows Installer](https://github.com/ohanatechsolutions/Aegis_White/actions/workflows/windows-installer.yml) and select **Run workflow**. On source updates to `main`, the workflow runs the tests, builds the executable with PyInstaller, uses Inno Setup to create the Windows installer, generates a SHA-256 checksum, and commits both files into this folder. It also keeps the zipped installer in GitHub Actions artifacts for 30 days.
 
-The installer packages the GUI; OSV-Scanner v2 and its offline advisory cache are independently installed when SCA is desired. Live offline OSV integration and manual Windows GUI runtime/installation checks are still release acceptance items.
+The installer packages the GUI. Offline SCA requires OSV-Scanner v2 and a populated offline database, which must be installed separately. Automated build and unit tests are not a substitute for manual installation/runtime acceptance testing.

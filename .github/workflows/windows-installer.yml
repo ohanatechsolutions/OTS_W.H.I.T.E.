@@ -6,6 +6,12 @@ on:
       - main
     tags:
       - 'v*'
+    paths:
+      - 'aegis_white/**'
+      - 'desktop_launcher.py'
+      - 'installer/AegisWhite.iss'
+      - '.github/workflows/windows-installer.yml'
+      - 'pyproject.toml'
 permissions:
   contents: read
 jobs:
