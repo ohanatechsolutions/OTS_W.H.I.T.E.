@@ -2,18 +2,22 @@ name: Windows Installer
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 permissions:
   contents: read
 jobs:
   package-windows:
+    permissions:
+      contents: write
     runs-on: windows-2022
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -38,6 +42,24 @@ jobs:
           $digest = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
           "$digest *$($exe.Name)" | Set-Content -Encoding ascii "$($exe.FullName).sha256"
           Write-Host "Installer: $($exe.Name)"
+      - name: Publish installer directly into repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem 'installer/output/*.exe' | Select-Object -First 1
+          if (-not $exe) { throw 'Installer not found' }
+          $destination = Join-Path 'installer' $exe.Name
+          Copy-Item -LiteralPath $exe.FullName -Destination $destination -Force
+          Copy-Item -LiteralPath "$($exe.FullName).sha256" -Destination "$destination.sha256" -Force
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- $destination "$destination.sha256"
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { Write-Host 'Already up to date'; exit 0 }
+          git commit -m 'build: add runnable Windows installer and SHA-256 manifest'
+          if ($LASTEXITCODE -ne 0) { throw 'Failed to commit installer' }
+          git push origin HEAD:main
+          if ($LASTEXITCODE -ne 0) { throw 'Failed to push installer to main' }
       - uses: actions/upload-artifact@v4
         with:
           name: AegisWhite-Windows-Installer
