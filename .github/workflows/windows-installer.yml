@@ -1,0 +1,48 @@
+name: Windows Installer
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: read
+jobs:
+  package-windows:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Install packaging tool
+        run: python -m pip install --disable-pip-version-check "pyinstaller==6.16.0"
+      - name: Build executable
+        run: python -m PyInstaller --noconfirm --clean --onefile --windowed --name AegisWhite desktop_launcher.py
+      - name: Build Inno Setup installer
+        shell: pwsh
+        run: |
+          $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $iscc)) { throw 'Inno Setup 6 missing on runner' }
+          & $iscc 'installer\AegisWhite.iss'
+          if ($LASTEXITCODE -ne 0) { throw 'Inno Setup compilation failed' }
+      - name: Generate installer SHA-256 checksum
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem installer\output\*.exe | Select-Object -First 1
+          if (-not $exe) { throw 'Installer output not found' }
+          $digest = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$digest *$($exe.Name)" | Set-Content -Encoding ascii "$($exe.FullName).sha256"
+          Write-Host "Installer: $($exe.Name)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AegisWhite-Windows-Installer
+          path: |
+            installer/output/*.exe
+            installer/output/*.sha256
+          if-no-files-found: error
+          retention-days: 30
