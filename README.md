@@ -22,7 +22,7 @@ Aegis White is a runnable, open-source Python desktop + CLI project that inspect
 
 ## Downloading the Windows installer
 
-The repository includes a **Windows installer build workflow** at `.github/workflows/windows-installer.yml`. Run it from **Actions → Windows Installer → Run workflow** (or push a version tag). Once the run succeeds, download the `AegisWhite-Windows-Installer` artifact from that run. It contains a native `.exe` installer and its SHA-256 checksum file. The installer is **unsigned** until Ohana Tech Solutions provides a signing certificate; Windows SmartScreen may warn. The build uses GitHub-hosted Windows runners and therefore GitHub processes this project source; scanning of **target repositories** remains local to the end user.
+The repository includes a **Windows installer build workflow** at `.github/workflows/windows-installer.yml`. Run it from **Actions → Windows Installer → Run workflow** (or push a version tag). Once the run succeeds, download the `AegisWhite-Windows-Installer` artifact from that run. For version-tagged builds, the same executable and checksum are also published through [GitHub Releases](https://github.com/ohanatechsolutions/Aegis_White/releases). Action artifacts expire after their retention period; releases are intended for longer-lived distribution. It contains a native `.exe` installer and its SHA-256 checksum file. The installer is **unsigned** until Ohana Tech Solutions provides a signing certificate; Windows SmartScreen may warn. The build uses GitHub-hosted Windows runners and therefore GitHub processes this project source; scanning of **target repositories** remains local to the end user.
 
 Installers are **not** built directly in this source tree; do not mistake `installer/AegisWhite.iss` for a clickable installer. Verify the `.sha256` file against the downloaded `.exe` before launching it. The installed GUI requires neither Python nor pip. Offline OSV-Scanner is still a separate optional dependency.
 
@@ -166,4 +166,18 @@ py -3 -m unittest discover -s tests -v
 
 This `0.1.0` release is a **tested baseline**, not a certified production-grade analyzer. Planned upgrades include taint-based SAST, additional secret provider validations via secure local verification, improved lockfile/SBOM diagnostics, signed release binaries for Windows, performance benchmarking on large monorepos, independent security review, and optional audited GitHub App integration with least-privilege read permissions. None of those enhancements is currently claimed as implemented.
 
-License: MIT. Developer: **Ohana Tech Solutions** (Ohana Tech).
+## Repository standards and maintainer resources
+
+- [Privacy policy](PRIVACY.md) — local scanning, report metadata, external tools, retention and deletion.
+- [Security and private disclosure](SECURITY.md) — supported versions and vulnerability reporting.
+- [Contributing](CONTRIBUTING.md) — development workflow, tests and security requirements.
+- [Third-party components](THIRD_PARTY_NOTICES.md) — core and packaging dependencies / notice obligations.
+- [Developer guide](docs/DEVELOPMENT.md) and [architecture](docs/ARCHITECTURE.md).
+- [Release/deployment procedure](docs/DEPLOYMENT.md) and [Windows installer guide](installer/README.md).
+- [Troubleshooting](docs/TROUBLESHOOTING.md), [test plan](docs/TEST_PLAN.md), and [changelog](CHANGELOG.md).
+- [GitHub Actions](https://github.com/ohanatechsolutions/Aegis_White/actions) and [Releases](https://github.com/ohanatechsolutions/Aegis_White/releases).
+
+The existing scanner is version **0.1.0** (see `pyproject.toml`). Windows releases are presently **unsigned**. There is no automatic update checker or remote GitHub scanning integration; audits require locally available checkouts. OSV dependency checks require a separately installed v2 binary and populated offline advisory database. GUI acceptance testing on actual Windows installations and bundled-library notice verification remain outstanding. The native executable is a *generated artifact* rather than a source file tracked in Git.
+
+License: [MIT](LICENSE). Developer: **Ohana Tech Solutions** (Ohana Tech).
+
