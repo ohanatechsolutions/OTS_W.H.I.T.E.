@@ -134,7 +134,7 @@ If the scanner reports a secret in history, **rotate/revoke it first**, then coo
 
 ## Suppressions and scope
 
-- Put `# ots-white: allow-secret` or `# ots-white: allow-sast` on a line only after explicit code-review approval for a known false positive. These markers affect the built-in matchers, not OSV advisories.
+- Put `# ots-white: allow-secret` or `# ots-white: allow-sast` on a line only after explicit code-review approval for a known false positive. Legacy suppression markers in existing Git history remain recognized for backward compatibility. These markers affect the built-in matchers, not OSV advisories.
 - Add `--exclude "path/glob"` to omit explicitly accepted paths. A directory named `.git`, `node_modules`, `vendor`, `.venv`, etc. is automatically excluded from **working-tree** inspection, but Git history still inspects reachable old blobs unless explicitly excluded.
 - The scanner ignores symlinks, binary files, and other intentionally unsupported inputs. Oversized/unreadable text is reported as incomplete. Scan limits are adjustable.
 

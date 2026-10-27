@@ -27,7 +27,7 @@ _COMPILED = [(code, suffix, level, re.compile(regex), title, fix) for code, suff
 def scan_sast(text: str, path: str) -> list[Finding]:
     found: list[Finding] = []
     for i, line in enumerate(text.splitlines(), 1):
-        if len(line) > 20_000 or "ots-white: allow-sast" in line:
+        if len(line) > 20_000 or "ots-white: allow-sast" in line or "aegis-white: allow-sast" in line:
             continue
         stripped = line.lstrip()
         if stripped.startswith(("#", "//", "*")):

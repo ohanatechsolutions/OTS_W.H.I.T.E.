@@ -41,6 +41,7 @@ class SecretTests(unittest.TestCase):
     def test_placeholder_and_suppression(self):
         self.assertFalse(scan_secrets('password="your_password_here"', "x.py"))
         self.assertFalse(scan_secrets('password="SomeSecret1234!" # ots-white: allow-secret', "x.py"))
+        self.assertFalse(scan_secrets('password="SomeSecret1234!" # aegis-white: allow-secret', "x.py"))
 
     def test_assignment_entropy(self):
         self.assertGreater(entropy("AbC29Xfg$yT1"), 3.1)
@@ -63,6 +64,9 @@ class SASTTests(unittest.TestCase):
     def test_python(self):
         f = scan_sast("subprocess.run(cmd, shell=True)\nrequests.get(url, verify=False)", "app.py")  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
         self.assertEqual({v.rule_id for v in f}, {"SAST-PY-SHELL", "SAST-PY-VERIFY"})
+
+    def test_legacy_sast_suppression(self):
+        self.assertFalse(scan_sast('eval(untrusted)  # aegis-white: allow-sast', "app.py"))
 
     def test_js(self):
         self.assertTrue(any(f.rule_id == "SAST-JS-TLS" for f in scan_sast("rejectUnauthorized: false", "main.ts")))
