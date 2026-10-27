@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a reproducible Aegis White problem (no sensitive material)
+about: Report a reproducible OTS W.H.I.T.E. problem (no sensitive material)
 title: "bug: "
 labels: bug
 assignees: ""
@@ -14,7 +14,7 @@ assignees: ""
 Use only synthetic fixtures. Do **not** include real tokens, private repository contents, secrets or unredacted reports.
 
 ## Environment
-- Aegis White version:
+- OTS W.H.I.T.E. version:
 - Operating system:
 - Python version (if running from source):
 - Git/OSV-Scanner versions (if applicable):
@@ -24,4 +24,4 @@ Use only synthetic fixtures. Do **not** include real tokens, private repository 
 Include sanitized commands and exit codes. A return code of 2 indicates incomplete scanning.
 
 ## Additional context
-For vulnerabilities in Aegis White itself, **do not file a public issue**; follow [SECURITY.md](../../SECURITY.md).
+For vulnerabilities in OTS W.H.I.T.E. itself, **do not file a public issue**; follow [SECURITY.md](../../SECURITY.md).

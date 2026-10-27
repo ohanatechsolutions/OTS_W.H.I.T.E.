@@ -8,13 +8,21 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from aegis_white.cli import audit, main
-from aegis_white.git_scan import changed_paths
-from aegis_white.model import ScanReport
-from aegis_white.reporting import as_sarif, render
-from aegis_white.sast import scan_sast
-from aegis_white.sca import SCAScanError, parse_osv_result, scan_sca
-from aegis_white.secrets import entropy, scan_secrets
+from ots_white.cli import audit, main
+from ots_white.git_scan import changed_paths
+from ots_white.model import ScanReport
+from ots_white.reporting import as_sarif, render
+from ots_white.sast import scan_sast
+from ots_white.sca import SCAScanError, parse_osv_result, scan_sca
+from ots_white.secrets import entropy, scan_secrets
+
+
+class BrandingTests(unittest.TestCase):
+    def test_branding_in_reports(self):
+        report = ScanReport(checks={"secrets": "completed", "sast": "completed", "sca": "skipped"})
+        self.assertEqual(report.as_dict()["tool"], "OTS W.H.I.T.E.")
+        self.assertEqual(as_sarif(report)["runs"][0]["tool"]["driver"]["name"], "OTS W.H.I.T.E.")
+        self.assertIn("OTS W.H.I.T.E.", render(report, "table"))
 
 
 class SecretTests(unittest.TestCase):
@@ -28,15 +36,15 @@ class SecretTests(unittest.TestCase):
         self.assertTrue(all(len(f.fingerprint) == 24 for f in found))
 
     def test_private_key_header(self):
-        self.assertEqual(scan_secrets("-----BEGIN PRIVATE KEY-----", "x.key")[0].rule_id, "SECRET-PEM")  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+        self.assertEqual(scan_secrets("-----BEGIN PRIVATE KEY-----", "x.key")[0].rule_id, "SECRET-PEM")  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
 
     def test_placeholder_and_suppression(self):
         self.assertFalse(scan_secrets('password="your_password_here"', "x.py"))
-        self.assertFalse(scan_secrets('password="SomeSecret1234!" # aegis-white: allow-secret', "x.py"))
+        self.assertFalse(scan_secrets('password="SomeSecret1234!" # ots-white: allow-secret', "x.py"))
 
     def test_assignment_entropy(self):
         self.assertGreater(entropy("AbC29Xfg$yT1"), 3.1)
-        self.assertTrue(scan_secrets('password="AbC29Xfg$yT1"', "x.py"))  # aegis-white: allow-secret (synthetic test fixture)
+        self.assertTrue(scan_secrets('password="AbC29Xfg$yT1"', "x.py"))  # ots-white: allow-secret (synthetic test fixture)
 
     def test_high_entropy_token_in_context(self):
         import random
@@ -53,7 +61,7 @@ class SecretTests(unittest.TestCase):
 
 class SASTTests(unittest.TestCase):
     def test_python(self):
-        f = scan_sast("subprocess.run(cmd, shell=True)\nrequests.get(url, verify=False)", "app.py")  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+        f = scan_sast("subprocess.run(cmd, shell=True)\nrequests.get(url, verify=False)", "app.py")  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
         self.assertEqual({v.rule_id for v in f}, {"SAST-PY-SHELL", "SAST-PY-VERIFY"})
 
     def test_js(self):
@@ -80,8 +88,8 @@ class AdapterTests(unittest.TestCase):
     def test_osv_scanner_is_explicitly_offline(self):
         with tempfile.TemporaryDirectory() as td:
             fake_output = json.dumps({"results": []}).encode()
-            with patch("aegis_white.sca.shutil.which", return_value="/mock/osv-scanner"), \
-                 patch("aegis_white.sca.subprocess.run") as mock_run:
+            with patch("ots_white.sca.shutil.which", return_value="/mock/osv-scanner"), \
+                 patch("ots_white.sca.subprocess.run") as mock_run:
                 mock_run.return_value.stdout = fake_output
                 mock_run.return_value.returncode = 0
                 self.assertEqual(scan_sca(Path(td)), [])
@@ -91,12 +99,12 @@ class AdapterTests(unittest.TestCase):
                 self.assertEqual(cmd[1:3], ["scan", "source"])
 
     def test_missing_binary_fails_closed(self):
-        with patch("aegis_white.sca.shutil.which", return_value=None):
+        with patch("ots_white.sca.shutil.which", return_value=None):
             with self.assertRaises(SCAScanError):
                 scan_sca(Path("."))
 
     def test_sarif_structure(self):
-        report = ScanReport(scan_secrets("-----BEGIN RSA PRIVATE KEY-----", "key.pem"),  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+        report = ScanReport(scan_secrets("-----BEGIN RSA PRIVATE KEY-----", "key.pem"),  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
                             checks={"secrets": "completed"})
         sarif = as_sarif(report)
         self.assertEqual(sarif["version"], "2.1.0")
@@ -111,7 +119,7 @@ class RepositoryTests(unittest.TestCase):
     def test_worktree_and_cli_exit(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            (root / "bad.py").write_text('password="A7a9!Bk0PzG3"\nsubprocess.run(command, shell=True)\n')  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+            (root / "bad.py").write_text('password="A7a9!Bk0PzG3"\nsubprocess.run(command, shell=True)\n')  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
             report = audit(root, no_sca=True)
             self.assertGreaterEqual(len(report.findings), 2)
             self.assertTrue(report.complete)
@@ -122,7 +130,7 @@ class RepositoryTests(unittest.TestCase):
 
     def test_missing_sca_marks_incomplete(self):
         with tempfile.TemporaryDirectory() as td:
-            with patch("aegis_white.sca.shutil.which", return_value=None):
+            with patch("ots_white.sca.shutil.which", return_value=None):
                 report = audit(Path(td))
             self.assertFalse(report.complete)
             self.assertEqual(report.checks["sca"], "failed")
@@ -153,11 +161,11 @@ class RepositoryTests(unittest.TestCase):
             self._git(root, "init", "-q")
             self._git(root, "config", "user.email", "test@example.invalid")
             self._git(root, "config", "user.name", "Example")
-            (root / "unchanged.py").write_text("eval(data)\n")  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+            (root / "unchanged.py").write_text("eval(data)\n")  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
             self._git(root, "add", ".")
             self._git(root, "commit", "-qm", "base")
             base = self._git(root, "rev-parse", "HEAD")
-            (root / "changed.py").write_text("exec(code)\n")  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+            (root / "changed.py").write_text("exec(code)\n")  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
             self._git(root, "add", ".")
             self._git(root, "commit", "-qm", "change")
             self.assertIn("changed.py", changed_paths(root, base))
@@ -166,7 +174,7 @@ class RepositoryTests(unittest.TestCase):
 
     def test_symlinks_are_not_followed(self):
         with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as outside:
-            (Path(outside) / "evil.py").write_text("eval(data)")  # aegis-white: allow-secret; aegis-white: allow-sast (test fixture)
+            (Path(outside) / "evil.py").write_text("eval(data)")  # ots-white: allow-secret; ots-white: allow-sast (test fixture)
             try:
                 (Path(td) / "ref.py").symlink_to(Path(outside) / "evil.py")
             except (OSError, NotImplementedError):

@@ -39,7 +39,7 @@ def scan_secrets(text: str, path: str) -> list[Finding]:
             # Treat minified or massive single lines as candidates for signature scanning,
             # but cap work and report an explicit partial-coverage condition in pipeline.
             continue
-        if "aegis-white: allow-secret" in line:
+        if "ots-white: allow-secret" in line:
             # Only inline, deliberate opt-out, reviewed like any other code change.
             continue
         for rule, severity, pattern, name in SIGNATURES:

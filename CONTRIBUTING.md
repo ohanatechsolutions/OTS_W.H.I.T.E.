@@ -1,4 +1,4 @@
-# Contributing to Aegis White
+# Contributing to OTS W.H.I.T.E.
 
 Thanks for helping improve this defensive tool. Contributors must only test against repositories they own or are expressly authorized to inspect.
 
@@ -8,7 +8,7 @@ Thanks for helping improve this defensive tool. Contributors must only test agai
 2. Clone this repository and work from a new branch.
 3. The core scanner has no Python runtime dependencies. An optional editable install uses `python -m pip install -e .`, which may download build tools; inspect your environment first.
 4. Run `python -m unittest discover -s tests -v`.
-5. Smoke-test the CLI with `python -m aegis_white . --no-sca --format table`. Exit code 1 means findings above the threshold, while 2 means incomplete coverage.
+5. Smoke-test the CLI with `python -m ots_white . --no-sca --format table`. Exit code 1 means findings above the threshold, while 2 means incomplete coverage.
 6. To exercise SCA, install a trusted OSV-Scanner v2 and prepare its offline advisory database **outside** any private target checkout. See [README.md](README.md).
 
 ## Contribution workflow

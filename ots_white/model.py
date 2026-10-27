@@ -53,7 +53,7 @@ class ScanReport:
     def as_dict(self) -> dict:
         by_severity = {s: sum(f.severity == s for f in self.findings) for s in LEVELS}
         return {
-            "tool": "Aegis White", "schema_version": "1.0", "complete": self.complete,
+            "tool": "OTS W.H.I.T.E.", "schema_version": "1.0", "complete": self.complete,
             "checks": self.checks, "scanned_files": self.scanned_files,
             "scanned_history_blobs": self.scanned_history_blobs,
             "summary": {"total": len(self.findings), "by_severity": by_severity},

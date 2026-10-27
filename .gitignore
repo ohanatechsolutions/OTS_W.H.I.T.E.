@@ -43,5 +43,5 @@ reports/
 *.audit.json
 .osv-cache/
 installer/output/
-installer/AegisWhite_Setup_*.exe
-installer/AegisWhite_Setup_*.exe.sha256
+installer/OTS_WHITE_Setup_*.exe
+installer/OTS_WHITE_Setup_*.exe.sha256

@@ -11,10 +11,10 @@ from .model import ScanReport
 from .reporting import render
 
 
-class AegisWhiteApp(tk.Tk):
+class OTSWhiteApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Aegis White | Ohana Tech")
+        self.title("OTS W.H.I.T.E. | Ohana Tech")
         self.geometry("1040x670")
         self.minsize(820, 510)
         self.folder = tk.StringVar(value=str(Path.cwd()))
@@ -30,8 +30,8 @@ class AegisWhiteApp(tk.Tk):
     def _create_widgets(self):
         header = ttk.Frame(self, padding=(18, 14))
         header.pack(fill="x")
-        ttk.Label(header, text="AEGIS WHITE", font=("Segoe UI", 23, "bold")).pack(anchor="w")
-        ttk.Label(header, text="Private, local-first repository security auditing  •  Ohana Tech Solutions",
+        ttk.Label(header, text="OTS W.H.I.T.E.", font=("Segoe UI", 23, "bold")).pack(anchor="w")
+        ttk.Label(header, text="White Hat Infiltration Testing Engine  •  Ohana Tech Solutions",
                   foreground="#687483").pack(anchor="w")
         path_row = ttk.Frame(self, padding=(18, 3))
         path_row.pack(fill="x")
@@ -154,9 +154,9 @@ class AegisWhiteApp(tk.Tk):
 
 def main():
     try:
-        AegisWhiteApp().mainloop()
+        OTSWhiteApp().mainloop()
     except tk.TclError:
-        raise SystemExit("Unable to open the desktop GUI. Use 'python -m aegis_white' instead.")
+        raise SystemExit("Unable to open the desktop GUI. Use 'python -m ots_white' instead.")
 
 
 if __name__ == "__main__":

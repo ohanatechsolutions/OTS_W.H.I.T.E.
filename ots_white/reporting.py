@@ -20,13 +20,13 @@ def as_sarif(report: ScanReport) -> dict:
             "message": {"text": f.message},
             "locations": [{"physicalLocation": {"artifactLocation": {"uri": path},
                                                "region": {"startLine": f.line, "startColumn": f.column}}}],
-            "partialFingerprints": {"aegisWhite/location": f.fingerprint},
+            "partialFingerprints": {"otsWhite/location": f.fingerprint},
             "properties": {"category": f.category, "severity": f.severity, "reference": f.reference},
         })
     return {
         "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
         "version": "2.1.0",
-        "runs": [{"tool": {"driver": {"name": "Aegis White", "version": "0.1.0",
+        "runs": [{"tool": {"driver": {"name": "OTS W.H.I.T.E.", "version": "0.1.0",
                                                "rules": list(rules.values())}},
                   "results": results,
                   "invocations": [{"executionSuccessful": report.complete,
@@ -39,7 +39,7 @@ def render(report: ScanReport, fmt: str) -> str:
         return json.dumps(report.as_dict(), indent=2) + "\n"
     if fmt == "sarif":
         return json.dumps(as_sarif(report), indent=2) + "\n"
-    lines = ["Aegis White — local repository security scan",
+    lines = ["OTS W.H.I.T.E. — local repository security scan",
              f"Status: {'COMPLETE' if report.complete else 'INCOMPLETE'} | Files: {report.scanned_files} | History blobs: {report.scanned_history_blobs} | Findings: {len(report.findings)}"]
     for name, status in report.checks.items():
         lines.append(f"  {name}: {status}")

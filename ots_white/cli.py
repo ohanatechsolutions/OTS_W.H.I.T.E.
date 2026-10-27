@@ -124,7 +124,7 @@ def audit(root: Path, *, history: bool = False, base: str | None = None,
 
 
 def make_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="aegis-white", description="Privacy-first local secrets, SAST, and offline SCA repository audit")
+    p = argparse.ArgumentParser(prog="ots-white", description="Privacy-first local secrets, SAST, and offline SCA repository audit")
     p.add_argument("path", nargs="?", default=".", help="Local working tree (never a URL)")
     p.add_argument("--history", action="store_true", help="Inspect all locally available Git history, including deleted files")
     p.add_argument("--base", help="Scan changed working-tree files compared with base...HEAD (local PR scan)")
@@ -158,7 +158,7 @@ def main(argv: list[str] | None = None) -> int:
                 target.write(output)
             if os.name == "posix":
                 output_path.chmod(0o600)
-            print(f"Aegis White report written: {output_path}", file=sys.stderr)
+            print(f"OTS W.H.I.T.E. report written: {output_path}", file=sys.stderr)
         except OSError:
             print("ERROR: could not write report", file=sys.stderr)
             return 2

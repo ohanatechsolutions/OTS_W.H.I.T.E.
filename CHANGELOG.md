@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — OTS W.H.I.T.E. (White Hat Infiltration Testing Engine) rebrand
+
+- Rebranded user-facing software, package/CLI identifiers, documentation, Windows installer, and release artifacts to OTS W.H.I.T.E. / OTS_WHITE.
+- Renamed importable package to `ots_white`, and updated launch scripts, tests, and workflow paths accordingly.
+- Preserved existing repository security-audit behavior; no new remote GitHub authentication or scanning added by this rename.
+- Main-branch Windows packaging now refreshes the rebranded executable installer and SHA-256 manifest in `installer/`.
+
+
 This project records shipped changes by version and pending repository work under **Unreleased**; no new application version is implied by the latter.
 
 ## [Unreleased]
@@ -7,7 +15,7 @@ This project records shipped changes by version and pending repository work unde
 ### Repository maintenance
 - Added project-specific privacy, contribution, third-party notice and engineering/deployment/troubleshooting documentation.
 - Established .editorconfig, broader Git ignore rules, CODEOWNERS, Dependabot and GitHub contribution templates.
-- Updated Windows build automation to avoid **future** generated installer commits to source history; the previously committed Windows 0.1.0 `.exe` and `.sha256` remain in `installer/` as requested. Version tags are configured to publish installer and matching checksum as GitHub Release assets; successful builds continue to upload temporary Actions artifacts.
+- Prior Windows packaging used Actions artifacts without committing additional installers; the rebrand enables publishing current installer binaries and SHA-256 manifests into `installer/`. Version tags are configured to publish installer and matching checksum as GitHub Release assets; successful builds continue to upload temporary Actions artifacts.
 - Updated private vulnerability reporting and maintainer guidance. No application scanning or GUI behavior was intentionally changed.
 
 

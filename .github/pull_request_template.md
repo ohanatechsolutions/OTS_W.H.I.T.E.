@@ -11,7 +11,7 @@ Explain the change and why it is needed.
 
 ## Verification
 - [ ] `python -m unittest discover -s tests -v`
-- [ ] `python -m aegis_white . --no-sca --format table`
+- [ ] `python -m ots_white . --no-sca --format table`
 - [ ] Other checks (describe):
 
 Record actual commands, exit codes and any skipped checks rather than claiming unrun tests passed.

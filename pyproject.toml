@@ -3,9 +3,9 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aegis-white"
+name = "ots-white"
 version = "0.1.0"
-description = "Privacy-first local GitHub repository secret, SAST, and offline SCA auditor"
+description = "OTS W.H.I.T.E. (White Hat Infiltration Testing Engine) — local GitHub repository security auditing"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "Ohana Tech Solutions"}]
@@ -14,8 +14,8 @@ classifiers = ["Programming Language :: Python :: 3", "Environment :: Console"]
 dependencies = []
 
 [project.scripts]
-aegis-white = "aegis_white.cli:main"
-aegis-white-gui = "aegis_white.gui:main"
+ots-white = "ots_white.cli:main"
+ots-white-gui = "ots_white.gui:main"
 
 [tool.setuptools.packages.find]
-include = ["aegis_white*"]
+include = ["ots_white*"]

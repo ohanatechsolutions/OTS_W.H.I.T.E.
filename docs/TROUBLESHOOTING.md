@@ -9,10 +9,10 @@ An `.iss` file is the **Inno Setup script**, not an executable installer. Downlo
 Use Python 3.11+ with Tkinter available. From the repository folder:
 
 ```powershell
-py -3 -m aegis_white.gui
+py -3 -m ots_white.gui
 ```
 
-For command-line scanning without Tkinter, use `py -3 -m aegis_white . --no-sca`. A packaged Windows installer contains a GUI executable, but it does not install Python or the optional OSV-Scanner.
+For command-line scanning without Tkinter, use `py -3 -m ots_white . --no-sca`. A packaged Windows installer contains a GUI executable, but it does not install Python or the optional OSV-Scanner.
 
 ## Exit code 2 or “audit incomplete”
 

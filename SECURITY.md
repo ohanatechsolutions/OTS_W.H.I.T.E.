@@ -1,6 +1,6 @@
 # Security policy and responsible disclosure
 
-Aegis White is a defensive local repository auditor by Ohana Tech Solutions. Only scan code that you own or are authorized to inspect.
+OTS W.H.I.T.E. is a defensive local repository auditor by Ohana Tech Solutions. Only scan code that you own or are authorized to inspect.
 
 ## Supported versions
 
@@ -32,7 +32,7 @@ Provide the affected version, a concise explanation, minimal synthetic reproduct
 - Standard console/GUI/JSON/SARIF findings are designed to omit raw matched credentials, source snippets and surrounding code. Paths, dependency metadata and commit IDs remain potentially sensitive.
 - An unavailable scanner/database or materially unreadable inputs are operational errors (exit code 2), not a clean audit.
 - Built-in SAST/secrets rules are heuristic and do not detect all vulnerabilities or secrets; missing/inaccessible Git refs and stale advisory caches limit coverage. Inline suppressions, exclusions and scan size caps can also produce misses.
-- Third-party tooling, its installation, Python/Tcl/Tk runtimes, the operating system, and GitHub-hosted CI have separate trust boundaries. Aegis White does not revoke secrets or remediate detected vulnerabilities automatically.
+- Third-party tooling, its installation, Python/Tcl/Tk runtimes, the operating system, and GitHub-hosted CI have separate trust boundaries. OTS W.H.I.T.E. does not revoke secrets or remediate detected vulnerabilities automatically.
 - Users remain responsible for secure report storage and deletion; see [PRIVACY.md](PRIVACY.md).
 
 Maintainers should review GitHub's available branch rulesets, private vulnerability reporting, Actions permissions and secret scanning settings for this private repository. Do not claim settings are enabled unless verified.

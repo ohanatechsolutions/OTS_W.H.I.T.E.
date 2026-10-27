@@ -1,4 +1,4 @@
-# Aegis White architecture and security boundaries
+# OTS W.H.I.T.E. architecture and security boundaries
 
 ## Dataflow
 
