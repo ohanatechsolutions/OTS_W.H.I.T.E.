@@ -127,19 +127,30 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f -- "installer/$($exe.Name)" "installer/$($exe.Name).sha256"
           git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host 'Installer files are unchanged.'
+            exit 0
+          }
+          $basic = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("x-access-token:$env:GH_TOKEN"))
+          $env:GIT_CONFIG_COUNT = '1'
+          $env:GIT_CONFIG_KEY_0 = 'http.https://github.com/.extraheader'
+          $env:GIT_CONFIG_VALUE_0 = "AUTHORIZATION: basic $basic"
+          try {
+            git fetch origin main
+            if ($LASTEXITCODE -ne 0) { throw 'Cannot verify current main head' }
+            $remoteHead = (git rev-parse FETCH_HEAD).Trim()
+            if ($remoteHead -ne $env:GITHUB_SHA) {
+              Write-Warning 'Newer source reached main during this build; leaving this validated installer in the Actions artifacts.'
+              exit 0
+            }
             git commit -m "build: refresh OTS W.H.I.T.E. Windows installer [skip ci]"
             if ($LASTEXITCODE -ne 0) { throw 'Installer commit failed' }
-            $basic = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("x-access-token:$env:GH_TOKEN"))
-            $env:GIT_CONFIG_COUNT = '1'
-            $env:GIT_CONFIG_KEY_0 = 'http.https://github.com/.extraheader'
-            $env:GIT_CONFIG_VALUE_0 = "AUTHORIZATION: basic $basic"
-            try {
-              git push origin HEAD:main
-              if ($LASTEXITCODE -ne 0) { throw 'Installer push failed' }
-            } finally {
-              Remove-Item Env:GIT_CONFIG_COUNT,Env:GIT_CONFIG_KEY_0,Env:GIT_CONFIG_VALUE_0 -ErrorAction SilentlyContinue
+            git push origin HEAD:main
+            if ($LASTEXITCODE -ne 0) {
+              Write-Warning 'Concurrent update to main prevented installer push; the validated installer remains available as an Actions artifact.'
             }
+          } finally {
+            Remove-Item Env:GIT_CONFIG_COUNT,Env:GIT_CONFIG_KEY_0,Env:GIT_CONFIG_VALUE_0 -ErrorAction SilentlyContinue
           }
 
   publish-release:
