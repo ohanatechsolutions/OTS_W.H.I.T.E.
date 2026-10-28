@@ -19,3 +19,6 @@ ots-white-gui = "ots_white.gui:main"
 
 [tool.setuptools.packages.find]
 include = ["ots_white*"]
+
+[tool.setuptools.package-data]
+ots_white = ["assets/*.png", "assets/*.ico"]
