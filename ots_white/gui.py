@@ -43,7 +43,7 @@ def asset_path(filename: str) -> Path:
 
 def fit_window_to_work_area(
     work_area: tuple[int, int, int, int],
-    preferred: tuple[int, int] = (1320, 820),
+    preferred: tuple[int, int] = (1300, 800),
     minimum: tuple[int, int] = (760, 560),
 ) -> tuple[str, tuple[int, int]]:
     """Return centered Tk geometry and achievable minimums within the usable screen."""
@@ -51,8 +51,8 @@ def fit_window_to_work_area(
     if work_width <= 0 or work_height <= 0:
         raise ValueError("The monitor work area must have positive dimensions.")
     # Leave space for window borders and avoid running beneath taskbars/docks.
-    width = min(preferred[0], max(1, int(work_width * 0.94)))
-    height = min(preferred[1], max(1, int(work_height * 0.94)))
+    width = min(preferred[0], max(1, work_width - 32))
+    height = min(preferred[1], max(1, work_height - 32))
     left = x + (work_width - width) // 2
     top = y + (work_height - height) // 2
     left_part = f"+{left}" if left >= 0 else str(left)
@@ -126,13 +126,9 @@ class OTSWhiteApp(tk.Tk):
         super().__init__()
         self.title("OTS W.H.I.T.E.  |  Ohana Tech Solutions")
         self.configure(bg=BG)
-        # Tk font sizes follow OS DPI; scale the preferred pixel size with them.
-        dpi_scale = max(1.0, min(3.0, float(self.tk.call("tk", "scaling")) / (96 / 72)))
-        preferred = (round(1320 * dpi_scale), round(820 * dpi_scale))
-        minimum_size = (round(760 * dpi_scale), round(560 * dpi_scale))
-        geometry, minimum = fit_window_to_work_area(
-            _work_area(self), preferred=preferred, minimum=minimum_size
-        )
+        # Default to 1300 x 800; only shrink when the current work area is smaller.
+        # Tk keeps its native DPI-aware font scaling for readable controls.
+        geometry, minimum = fit_window_to_work_area(_work_area(self))
         self.geometry(geometry)
         self.minsize(*minimum)
         self.folder = tk.StringVar(value=str(Path.cwd()))
