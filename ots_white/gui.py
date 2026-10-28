@@ -126,7 +126,13 @@ class OTSWhiteApp(tk.Tk):
         super().__init__()
         self.title("OTS W.H.I.T.E.  |  Ohana Tech Solutions")
         self.configure(bg=BG)
-        geometry, minimum = fit_window_to_work_area(_work_area(self))
+        # Tk font sizes follow OS DPI; scale the preferred pixel size with them.
+        dpi_scale = max(1.0, min(3.0, float(self.tk.call("tk", "scaling")) / (96 / 72)))
+        preferred = (round(1320 * dpi_scale), round(820 * dpi_scale))
+        minimum_size = (round(760 * dpi_scale), round(560 * dpi_scale))
+        geometry, minimum = fit_window_to_work_area(
+            _work_area(self), preferred=preferred, minimum=minimum_size
+        )
         self.geometry(geometry)
         self.minsize(*minimum)
         self.folder = tk.StringVar(value=str(Path.cwd()))
@@ -217,8 +223,36 @@ class OTSWhiteApp(tk.Tk):
         tk.Label(sidebar, text="OHANA TECH SOLUTIONS", bg=DEEP, fg=MUTED,
                  font=(FONT, 8, "bold")).pack(side="bottom", anchor="w", padx=22, pady=22)
 
-        workspace = tk.Frame(shell, bg=BG)
-        workspace.pack(side="left", fill="both", expand=True)
+        # Allow the dashboard to scroll if high DPI or a small screen makes the
+        # controls taller than the available client area. The findings list retains
+        # its own independent scrollbar.
+        workspace_shell = tk.Frame(shell, bg=BG)
+        workspace_shell.pack(side="left", fill="both", expand=True)
+        workspace_canvas = tk.Canvas(workspace_shell, bg=BG, bd=0,
+                                     highlightthickness=0)
+        workspace_canvas.pack(side="left", fill="both", expand=True)
+        workspace_scrollbar = tk.Scrollbar(workspace_shell, orient="vertical",
+                                           command=workspace_canvas.yview,
+                                           bg=SURFACE, troughcolor=DEEP)
+        workspace_canvas.configure(yscrollcommand=workspace_scrollbar.set)
+        workspace = tk.Frame(workspace_canvas, bg=BG)
+        workspace_window = workspace_canvas.create_window(
+            (0, 0), window=workspace, anchor="nw")
+
+        def resize_workspace(_event=None):
+            needed = workspace.winfo_reqheight()
+            visible = workspace_canvas.winfo_height()
+            workspace_canvas.itemconfigure(
+                workspace_window, width=workspace_canvas.winfo_width(),
+                height=max(needed, visible))
+            workspace_canvas.configure(scrollregion=workspace_canvas.bbox("all"))
+            if needed > visible + 2 and not workspace_scrollbar.winfo_manager():
+                workspace_scrollbar.pack(side="right", fill="y")
+            elif needed <= visible + 2 and workspace_scrollbar.winfo_manager():
+                workspace_scrollbar.pack_forget()
+
+        workspace.bind("<Configure>", resize_workspace)
+        workspace_canvas.bind("<Configure>", resize_workspace)
 
         top = tk.Frame(workspace, bg=BG)
         top.pack(fill="x", padx=24, pady=(22, 16))
