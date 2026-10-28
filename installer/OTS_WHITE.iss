@@ -18,6 +18,7 @@ OutputBaseFilename=OTS_WHITE_Setup_v{#AppVersion}_x64
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=..\ots_white\assets\ots_white.ico
 UninstallDisplayIcon={app}\OTS_WHITE.exe
 
 [Files]
