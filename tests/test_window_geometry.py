@@ -20,8 +20,8 @@ class WindowGeometryTests(unittest.TestCase):
         self.assertLessEqual(y + height, top + work_height)
         self.assertLessEqual(minimum[0], width)
         self.assertLessEqual(minimum[1], height)
-        self.assertLessEqual(width, 1320)
-        self.assertLessEqual(height, 820)
+        self.assertLessEqual(width, 1300)
+        self.assertLessEqual(height, 800)
 
     def test_typical_laptop_with_taskbar(self):
         self._assert_inside((0, 0, 1366, 728))
@@ -37,7 +37,7 @@ class WindowGeometryTests(unittest.TestCase):
 
     def test_geometry_is_centered(self):
         value, _ = fit_window_to_work_area((0, 0, 1920, 1040))
-        self.assertEqual(value, "1320x820+300+110")
+        self.assertEqual(value, "1300x800+310+120")
 
     def test_invalid_area_fails_safely(self):
         with self.assertRaises(ValueError):
