@@ -69,17 +69,18 @@ class OTSWhiteApp(tk.Tk):
     def _load_icons(self):
         ico = asset_path("ots_white.ico")
         png = asset_path("ots_white_logo.png")
-        if ico.exists() and sys.platform == "win32":
-            try:
-                self.iconbitmap(default=str(ico))
-            except tk.TclError:
-                pass
         if png.exists():
             try:
                 self.logo_image = tk.PhotoImage(file=str(png))
                 self.iconphoto(True, self.logo_image)
             except tk.TclError:
                 self.logo_image = None
+        if ico.exists() and sys.platform == "win32":
+            # Keep the native ICO as the Windows titlebar/taskbar icon.
+            try:
+                self.iconbitmap(default=str(ico))
+            except tk.TclError:
+                pass
 
     @staticmethod
     def _label(parent, text, size=10, color=TEXT, bold=False, **options):
@@ -116,8 +117,7 @@ class OTSWhiteApp(tk.Tk):
         brand = tk.Frame(sidebar, bg=DEEP)
         brand.pack(fill="x", padx=20, pady=(22, 25))
         if self.logo_image is not None:
-            # PNG is bundled at 192px, downsized without external dependencies.
-            self._label(brand, "", size=1).pack_forget()
+            # Small, optimized PNG is suitable for the sidebar branding.
             tk.Label(brand, image=self.logo_image, bg=DEEP, bd=0).pack(anchor="w")
         self._label(brand, "OTS W.H.I.T.E.", 17, TEXT, True).pack(anchor="w", pady=(8, 4))
         self._label(brand, "WHITE HAT INFILTRATION\nTESTING ENGINE",
