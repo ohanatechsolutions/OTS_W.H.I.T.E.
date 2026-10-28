@@ -8,6 +8,24 @@ OTS W.H.I.T.E. is a runnable, open-source Python desktop + CLI project that insp
 
 > Only scan code you own or are authorized to audit. This tool is an auditing aid, not a guarantee that a repository is secure. It does not automatically rotate/revoke secrets, remediate bugs, or modify source code.
 
+## Desktop appearance — steel-blue dark theme
+
+The Windows GUI now uses a **dark slate security dashboard** with steel-blue
+highlights, subtle bordered panels, searchable findings, category filters,
+severity badges, scan summary tiles, and click-to-view remediation guidance.
+This is a visual redesign of the **repository auditing software** — it does
+**not** collect or save clipboard history.
+
+Branded artwork is packaged in `ots_white/assets/`:
+
+- `ots_white_logo.png`: optimized PNG for the app's header and window.
+- `ots_white.ico`: Windows executable, installer, desktop shortcut and taskbar.
+
+The Windows installer workflow embeds both assets in the packaged application.
+Existing security modules and local-only reporting are unchanged. See
+[Desktop UI design](docs/UI_DESIGN.md) for colors, functionality and native
+Tkinter limitations (no true backdrop blur / rounded window corners).
+
 ## What's included
 
 | Module | Operation | Coverage |
