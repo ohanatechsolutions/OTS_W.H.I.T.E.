@@ -41,13 +41,94 @@ def asset_path(filename: str) -> Path:
     return root / "ots_white" / "assets" / filename
 
 
+def fit_window_to_work_area(
+    work_area: tuple[int, int, int, int],
+    preferred: tuple[int, int] = (1320, 820),
+    minimum: tuple[int, int] = (760, 560),
+) -> tuple[str, tuple[int, int]]:
+    """Return centered Tk geometry and achievable minimums within the usable screen."""
+    x, y, work_width, work_height = work_area
+    if work_width <= 0 or work_height <= 0:
+        raise ValueError("The monitor work area must have positive dimensions.")
+    # Leave space for window borders and avoid running beneath taskbars/docks.
+    width = min(preferred[0], max(1, int(work_width * 0.94)))
+    height = min(preferred[1], max(1, int(work_height * 0.94)))
+    left = x + (work_width - width) // 2
+    top = y + (work_height - height) // 2
+    left_part = f"+{left}" if left >= 0 else str(left)
+    top_part = f"+{top}" if top >= 0 else str(top)
+    return f"{width}x{height}{left_part}{top_part}", (
+        min(minimum[0], width), min(minimum[1], height)
+    )
+
+
+def _enable_windows_dpi_awareness() -> None:
+    """Use physical monitor pixels in Tk when Windows supports per-monitor DPI."""
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+
+        # Per-monitor DPI v2, falling back for older Windows versions.
+        if ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4)):
+            return
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except (AttributeError, OSError, ValueError):
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()
+        except (AttributeError, OSError):
+            pass
+
+
+def _work_area(window: tk.Tk) -> tuple[int, int, int, int]:
+    """Read the actual monitor work area, excluding the Windows taskbar."""
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            from ctypes import wintypes
+
+            class Rect(ctypes.Structure):
+                _fields_ = [
+                    ("left", wintypes.LONG), ("top", wintypes.LONG),
+                    ("right", wintypes.LONG), ("bottom", wintypes.LONG),
+                ]
+
+            class MonitorInfo(ctypes.Structure):
+                _fields_ = [
+                    ("cbSize", wintypes.DWORD), ("rcMonitor", Rect),
+                    ("rcWork", Rect), ("dwFlags", wintypes.DWORD),
+                ]
+
+            user32 = ctypes.windll.user32
+            user32.MonitorFromWindow.argtypes = [wintypes.HWND, wintypes.DWORD]
+            user32.MonitorFromWindow.restype = wintypes.HANDLE
+            user32.GetMonitorInfoW.argtypes = [
+                wintypes.HANDLE, ctypes.POINTER(MonitorInfo)
+            ]
+            user32.GetMonitorInfoW.restype = wintypes.BOOL
+            monitor = user32.MonitorFromWindow(window.winfo_id(), 2)
+            info = MonitorInfo()
+            info.cbSize = ctypes.sizeof(MonitorInfo)
+            if monitor and user32.GetMonitorInfoW(monitor, ctypes.byref(info)):
+                rect = info.rcWork
+                return (
+                    rect.left, rect.top,
+                    rect.right - rect.left, rect.bottom - rect.top,
+                )
+        except (AttributeError, OSError, ValueError):
+            pass
+    return (window.winfo_vrootx(), window.winfo_vrooty(),
+            window.winfo_screenwidth(), window.winfo_screenheight())
+
+
 class OTSWhiteApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("OTS W.H.I.T.E.  |  Ohana Tech Solutions")
         self.configure(bg=BG)
-        self.geometry("1320x820")
-        self.minsize(1000, 680)
+        geometry, minimum = fit_window_to_work_area(_work_area(self))
+        self.geometry(geometry)
+        self.minsize(*minimum)
         self.folder = tk.StringVar(value=str(Path.cwd()))
         self.history = tk.BooleanVar(value=False)
         self.include_sca = tk.BooleanVar(value=True)
@@ -162,12 +243,17 @@ class OTSWhiteApp(tk.Tk):
         self._button(pathline, "Browse…", self._browse).pack(side="left", padx=(9, 0))
         controls = tk.Frame(config, bg=SURFACE)
         controls.pack(fill="x", padx=17, pady=(3, 14))
-        self._check(controls, "Git history", self.history).pack(side="left", padx=(0, 16))
-        self._check(controls, "Offline dependency SCA (OSV required)", self.include_sca).pack(
-            side="left", padx=(0, 16))
-        self._label(controls, "PR base:", 9, MUTED).pack(side="left")
-        self._entry(controls, self.base, width=13).pack(side="left", padx=(8, 10))
-        self.start_button = self._button(controls, "Run Audit", self._start, primary=True)
+        # Separate rows keep the actions visible on narrower laptop screens.
+        options_row = tk.Frame(controls, bg=SURFACE)
+        options_row.pack(fill="x")
+        self._check(options_row, "Git history", self.history).pack(side="left", padx=(0, 16))
+        self._check(options_row, "Offline dependency SCA (OSV required)", self.include_sca).pack(
+            side="left")
+        actions_row = tk.Frame(controls, bg=SURFACE)
+        actions_row.pack(fill="x", pady=(6, 0))
+        self._label(actions_row, "PR base:", 9, MUTED).pack(side="left")
+        self._entry(actions_row, self.base, width=13).pack(side="left", padx=(8, 10))
+        self.start_button = self._button(actions_row, "Run Audit", self._start, primary=True)
         self.start_button.pack(side="right")
 
         metricline = tk.Frame(workspace, bg=BG)
@@ -450,6 +536,7 @@ class OTSWhiteApp(tk.Tk):
 
 
 def main():
+    _enable_windows_dpi_awareness()
     try:
         OTSWhiteApp().mainloop()
     except tk.TclError:
