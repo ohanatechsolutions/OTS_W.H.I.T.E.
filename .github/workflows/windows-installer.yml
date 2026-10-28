@@ -147,6 +147,10 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw 'Installer commit failed' }
             git push origin HEAD:main
             if ($LASTEXITCODE -ne 0) {
+              git fetch origin main
+              if ($LASTEXITCODE -ne 0) { throw 'Push failed and current main could not be checked' }
+              $afterHead = (git rev-parse FETCH_HEAD).Trim()
+              if ($afterHead -eq $remoteHead) { throw 'Installer push failed without a competing commit' }
               Write-Warning 'Concurrent update to main prevented installer push; the validated installer remains available as an Actions artifact.'
               exit 0
             }
