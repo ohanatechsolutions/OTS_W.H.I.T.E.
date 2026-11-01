@@ -3,21 +3,8 @@ name: OTS W.H.I.T.E. — Windows Installer
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
-    paths:
-      - 'ots_white/**'
-      - 'desktop_launcher.py'
-      - 'installer/**'
-      - '!installer/*.exe'
-      - '!installer/*.sha256'
-      - 'tests/**'
-      - 'LICENSE'
-      - 'THIRD_PARTY_NOTICES.md'
-      - '.github/workflows/windows-installer.yml'
-      - 'pyproject.toml'
 
 # Read-only scanning; successful main builds publish signed-off source-derived installer binaries.
 # The release job continues to require a version tag.
@@ -107,11 +94,11 @@ jobs:
             ${{ runner.temp }}\\ots-white-src\\installer\\output\\*.exe
             ${{ runner.temp }}\\ots-white-src\\installer\\output\\*.sha256
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 7
 
       - name: Commit fresh renamed installer to repository
         working-directory: ${{ runner.temp }}\\ots-white-src
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
