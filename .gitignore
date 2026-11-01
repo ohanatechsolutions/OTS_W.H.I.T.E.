@@ -45,3 +45,13 @@ reports/
 installer/output/
 installer/OTS_WHITE_Setup_*.exe
 installer/OTS_WHITE_Setup_*.exe.sha256
+
+# Open-source publication security baseline
+**/.env
+**/.env.*
+!**/.env.example
+*.keystore
+credentials.json
+*.sqlite
+*.sqlite3
+*.db
