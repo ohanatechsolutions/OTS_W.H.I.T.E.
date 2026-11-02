@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   package-windows:
+    if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
     runs-on: windows-2022
     timeout-minutes: 35
     permissions:
