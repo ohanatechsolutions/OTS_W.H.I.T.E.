@@ -101,3 +101,8 @@ This guard protects **new automatic runner compute**, but is not a GitHub billin
 - All eight repositories remain private. Billing budgets, visibility changes and main branch protection are account-level actions outside the connected repository-file operations. Do not publish on the basis of these checks alone.
 
 **Publication decision remains HOLD for all repositories until historical checks, binary inspection where applicable, and owner account billing limits are verified.** Git author addresses and older workflow logs may be exposed on publication; the user must review and accept that exposure, or plan appropriate mitigation before changing visibility.
+
+
+## Billing clarification — November 1, 2026
+
+The owner reports gross metered usage of $0.14 and an equal included-usage discount of $0.14 for November, so the reported net usage is $0.00. The owner does not wish to add a payment method. Do not add one solely for a spending budget: GitHub generally blocks excess paid Actions usage when no valid payment method is on file. Existing guidance elsewhere in this document about setting $0 budgets is conditional on an account having a payment method or an active paid product. Review BOTH personal-account billing pages for net charges and any paid products before publishing. Public repositories can use standard GitHub-hosted runner minutes for free; Git LFS and certain storage/runner services may have separate limits. These observations are not verification of actual payment method status in either account.
