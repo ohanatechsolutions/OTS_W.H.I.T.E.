@@ -207,6 +207,9 @@ def audit_repo(full_name: str, root: Path) -> dict:
         # This is a finding triage tool, NOT an automatic safety certification.
         report['complete'] = bool(report['history']['gitleaks']['complete'] and
                                   report['history']['ots_white']['complete'] and
+                                  report['history']['gitleaks']['finding_count'] == 0 and
+                                  report['history']['ots_white']['secret_findings'] == 0 and
+                                  report['releases']['possible_credentials'] == 0 and
                                   report['releases']['incomplete_assets'] == 0 and
                                   not report['unverified_binaries'])
         if report['unverified_binaries']:
