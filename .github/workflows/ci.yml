@@ -1,5 +1,6 @@
 name: OTS W.H.I.T.E. CI
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -10,6 +11,7 @@ permissions:
   contents: read
 jobs:
   test-and-scan:
+    if: ${{ !github.event.repository.private || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
