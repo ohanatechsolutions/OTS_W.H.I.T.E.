@@ -95,7 +95,7 @@ jobs:
             ${{ runner.temp }}\\ots-white-src\\installer\\output\\*.exe
             ${{ runner.temp }}\\ots-white-src\\installer\\output\\*.sha256
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
 
       - name: Commit fresh renamed installer to repository
         working-directory: ${{ runner.temp }}\\ots-white-src
