@@ -83,3 +83,10 @@ Important binary limitations: historical executable/ZIP blobs require independen
 GitHub standard hosted runners are free for public repositories; larger runners, Git LFS, and some storage remain metered. Before changing visibility, visit the owner account Billing > Budgets and alerts controls for BOTH ohanatechsolutions and ICF-AI. Set $0 product budgets for metered Actions/storage and LFS usage, select Stop usage when budget limit is reached wherever available, confirm each budget is a hard stop rather than an email-only alert, and enable included-usage alerts. A newly created budget does not erase earlier consumption in the same cycle.
 
 The connected GitHub app cannot modify account billing, repo visibility, branch-protection settings, or inspect all private binary bytes. Those controls must be confirmed in GitHub settings before publication. For public repos, configure branch rulesets that prohibit deletion/force pushes, require appropriate review, and disallow modification of trusted release workflows without owner approval.
+
+
+## Interim no-automatic-private-runner-cost guard
+
+As part of the November 1, 2026 preparation, the automatically triggered jobs in all seven workflow-bearing repositories were updated with a repository-visibility guard. They skip GitHub-hosted runner execution while the repository is private. Automated checks resume when the repository becomes public. Manual workflow_dispatch invocations remain possible in private repositories and can still consume included usage or create costs. Five installer-heavy workflow artifact retentions were also reduced from seven days to one day; this does not delete existing stored artifacts or erase past usage.
+
+This guard protects **new automatic runner compute**, but is not a GitHub billing hard stop. Previously stored artifacts, Git LFS history, manual runs, and other metered products still require the account-level budget settings above. After converting any repository to public, verify that its critical workflow checks actually run, are green, and are included in required branch rules. Do not claim tests passed when they were skipped by the private-repository cost guard.
