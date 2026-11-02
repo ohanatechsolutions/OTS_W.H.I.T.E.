@@ -59,3 +59,27 @@ Keep original source in Git, not ever-growing installer binaries.
 - [ ] Maintainer confirms a repository-specific publication checklist
 
 **Current decision: NOT APPROVED FOR PUBLICATION.** Lack of a confirmed finding is not the same as a complete negative audit.
+
+
+## Executable audit runner added November 1, 2026
+
+A read-only audit runner is included at scripts/publication_gate.py. It uses a private temporary working directory and never modifies remote GitHub repositories. It requires Python 3.11+, Git, GitHub CLI authenticated to an account authorized for each repository, and Gitleaks 8.19+, installed from trusted vendor releases. Use existing CLI authentication; do not enter credentials into a script, URL or support ticket.
+
+Run from a trusted checkout of OTS W.H.I.T.E.:
+
+~~~powershell
+py -3 -m unittest discover -s tests -v
+py -3 scripts/publication_gate.py --output "$env:USERPROFILE\Documents\ots-private-publication-audit.json"
+~~~
+
+The audit enumerates all eight named repositories; it pulls complete remote branches, tags, and accessible pull-request heads; runs full-history Gitleaks plus OTS W.H.I.T.E.'s local history scanner; downloads existing release assets; and scans common ASCII/UTF-16LE credential shapes in these files and ZIP members. It leaves raw scanner reports in a temporary directory that is deleted. The written JSON contains counts and file names but never actual detected secret strings.
+
+For account-specific authentication, use the GitHub CLI commands gh auth status, gh auth login, and gh auth switch, authenticating to an account that can read each private repository. Re-run failed repositories individually with the --repo owner/name option. The script fails closed when scanners, history, or release inspection cannot complete. Its publication_cleared field is always false by design: no script can attest malware freedom, legal permission, or account billing limits.
+
+Important binary limitations: historical executable/ZIP blobs require independent provenance and malware review. Git LFS pointers do not include the original binary bytes; the script does not download them because doing so can consume billable LFS bandwidth. Older GitHub Actions logs, caches, discussion attachments, and binary file formats such as RAR/7z also require separate review. A clean output cannot replace these publication gates.
+
+## Cost and repository administration
+
+GitHub standard hosted runners are free for public repositories; larger runners, Git LFS, and some storage remain metered. Before changing visibility, visit the owner account Billing > Budgets and alerts controls for BOTH ohanatechsolutions and ICF-AI. Set $0 product budgets for metered Actions/storage and LFS usage, select Stop usage when budget limit is reached wherever available, confirm each budget is a hard stop rather than an email-only alert, and enable included-usage alerts. A newly created budget does not erase earlier consumption in the same cycle.
+
+The connected GitHub app cannot modify account billing, repo visibility, branch-protection settings, or inspect all private binary bytes. Those controls must be confirmed in GitHub settings before publication. For public repos, configure branch rulesets that prohibit deletion/force pushes, require appropriate review, and disallow modification of trusted release workflows without owner approval.
