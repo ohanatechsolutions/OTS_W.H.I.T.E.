@@ -81,6 +81,11 @@ def scan_path(path: Path, *, depth: int = 0) -> dict:
             with zipfile.ZipFile(path) as archive:
                 entries = archive.infolist()
                 result['archive_entries'] = len(entries)
+                # Bound aggregate decompression and entry count for hostile ZIP archives.
+                if len(entries) > 10000 or sum(x.file_size for x in entries) > ARCHIVE_MAX_BYTES:
+                    result['incomplete'] = True
+                    result['reason'] = 'archive exceeds total member/size limit'
+                    return result
                 for item in entries:
                     if item.is_dir():
                         continue
@@ -158,6 +163,10 @@ def audit_repo(full_name: str, root: Path) -> dict:
         report['history']['commits'] = int(count.stdout.strip())
         report['history']['gitleaks'] = gitleaks(dest, root)
         try:
+            # Direct invocation from scripts/ may omit the project root from sys.path.
+            local_package_root = str(Path(__file__).resolve().parent.parent)
+            if local_package_root not in sys.path:
+                sys.path.insert(0, local_package_root)
             from ots_white.cli import audit  # Independent built-in scanner on all historical blobs
             white_result = audit(dest, history=True, no_sca=True)
             report['history']['ots_white'] = {
