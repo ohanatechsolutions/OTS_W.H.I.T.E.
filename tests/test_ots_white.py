@@ -68,7 +68,7 @@ class SecretTests(unittest.TestCase):
                                  {f.rule_id for f in scan_secrets(line, "synthetic.go")})
         # Quoted real-looking literals still trigger the same rule.
         self.assertIn("SECRET-ASSIGNMENT",
-                      {f.rule_id for f in scan_secrets('password="AbC29Xfg$yT1"', "test.py")})
+                      {f.rule_id for f in scan_secrets('password="AbC29Xfg$yT1"', "test.py")})  # ots-white: allow-secret (synthetic positive fixture only)
 
     def test_non_secrets(self):
         self.assertFalse(scan_secrets('const api_key = process.env.API_KEY;', "app.js"))

@@ -25,6 +25,45 @@ jobs:
       - name: Unit tests (standard library only)
         run: python -m unittest discover -s tests -v
       - name: Privacy-first static and secret audit (no outbound APIs)
-        run: python -m ots_white . --no-sca --history --fail-on high --format table --exclude 'installer/*.exe'
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from ots_white.cli import audit
+          from ots_white.model import LEVELS
+
+          report = audit(Path(".").resolve(), history=True, no_sca=True,
+                         excludes=["installer/*.exe"])
+          if not report.complete:
+              raise SystemExit("W.H.I.T.E. own repository audit incomplete; check local coverage privately")
+
+          # A synthetic quoted credential fixture was introduced in PR #7.
+          # Git history is immutable: current source uses the inline allow-secret
+          # marker, while the historical blob cannot be altered without rewriting
+          # published commits. Only this exact blob/rule/line may be accepted.
+          historical_fixture = (
+              "git:67a7f1362cbc257fc05aee0fb202b7d3f159e20c:tests/test_ots_white.py",
+              71, "SECRET-ASSIGNMENT", "high"
+          )
+          allowed = []
+          unexpected = []
+          for finding in report.findings:
+              if LEVELS[finding.severity] < LEVELS["high"]:
+                  continue
+              identity = (finding.path, finding.line, finding.rule_id, finding.severity)
+              if identity == historical_fixture:
+                  allowed.append(finding)
+              else:
+                  unexpected.append(finding)
+
+          # Never print matched secret material or source lines in public CI logs.
+          for finding in unexpected:
+              print("Unreviewed finding metadata:", finding.rule_id, finding.path, finding.line)
+          if len(allowed) != 1 or unexpected:
+              raise SystemExit("W.H.I.T.E. security gate blocked on new high/critical findings or changed fixture")
+          print(f"W.H.I.T.E. worktree+history audit passed: {report.scanned_files} current text files; "
+                f"{report.scanned_history_blobs} historical blobs; "
+                "one exact known synthetic historical fixture reviewed; no other high/critical")
+          PY
 # SCA must be run separately with OSV-Scanner v2 and a pre-populated local DB.
 # No package installation/build is performed on the scanned repository.
