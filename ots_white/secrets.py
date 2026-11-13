@@ -19,6 +19,11 @@ ASSIGNMENT = re.compile(
     r"(?i)\b(?:password|passwd|pwd|secret(?:_key)?|api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret)"
     r"\b\s*[=:]\s*['\"]?([^\s'\";,\}]{8,})"
 )
+# Compute calls are evaluated at runtime, so their source expressions are not
+# literal credentials. Avoid high-severity false positives for e.g.
+# secret: hex.EncodeToString(randomBytes) and secret: strings.Repeat(...).
+# Quoted string literals are still scanned even if they look like a call.
+COMPUTED_CALL = re.compile(r"^(?:[A-Za-z_$][A-Za-z0-9_$]*\.)*[A-Za-z_$][A-Za-z0-9_$]*\(")
 ENTROPY_CANDIDATE = re.compile(r"(?<![A-Za-z0-9+/=_-])[A-Za-z0-9+/=_-]{40,200}(?![A-Za-z0-9+/=_-])")
 ENTROPY_CONTEXT = re.compile(r"(?i)\b(?:token|credential|secret|password|api[_-]?key|auth|bearer)\b")
 LOCKFILE_NAMES = {"package-lock.json", "yarn.lock", "pnpm-lock.yaml", "composer.lock", "Cargo.lock", "poetry.lock", "Gemfile.lock"}
@@ -50,6 +55,11 @@ def scan_secrets(text: str, path: str) -> list[Finding]:
         for match in ASSIGNMENT.finditer(line):
             candidate = match.group(1)
             assignment_spans.append(match.span(1))
+            # The matched source includes the opening quote if the value was
+            # actually a literal string. A bare function call is not one.
+            quoted = match.start(1) > 0 and line[match.start(1) - 1] in "'\""
+            if not quoted and COMPUTED_CALL.match(candidate):
+                continue
             if PLACEHOLDERS.match(candidate) or candidate.lower().startswith(("http://", "https://", "process.env.", "os.environ", "getenv(", "env[", "settings.", "config.")):
                 continue
             if len(candidate) >= 12 and entropy(candidate) >= 3.2 or (len(candidate) >= 8 and re.search(r"(?i)password|passwd|pwd", match.group(0)) and entropy(candidate) >= 2.6):

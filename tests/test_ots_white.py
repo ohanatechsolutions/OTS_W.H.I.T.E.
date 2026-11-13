@@ -56,6 +56,20 @@ class SecretTests(unittest.TestCase):
         self.assertIn("SECRET-HIGH-ENTROPY", {f.rule_id for f in found})
         self.assertNotIn(simulated, repr(found))
 
+    def test_computed_secret_values_are_not_hardcoded_credentials(self):
+        for line in (
+            'return &Server{secret: hex.EncodeToString(secretRaw), reportsDir: path}',
+            'secret: strings.Repeat("a", 48),',
+            'password = fetchFromEnvironment()',
+            'client_secret: crypto.randomBytes(48).toString("hex")',
+        ):
+            with self.subTest(line=line):
+                self.assertNotIn("SECRET-ASSIGNMENT",
+                                 {f.rule_id for f in scan_secrets(line, "synthetic.go")})
+        # Quoted real-looking literals still trigger the same rule.
+        self.assertIn("SECRET-ASSIGNMENT",
+                      {f.rule_id for f in scan_secrets('password="AbC29Xfg$yT1"', "test.py")})  # ots-white: allow-secret (synthetic positive fixture only)
+
     def test_non_secrets(self):
         self.assertFalse(scan_secrets('const api_key = process.env.API_KEY;', "app.js"))
 
